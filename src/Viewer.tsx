@@ -20,25 +20,25 @@ class Viewer extends Component {
 
   public componentDidMount() { 
     if(!window.Autodesk) { 
-      this.loadCss('https://developer.api.autodesk.com/modelderivative/v2/viewers/style.min.css');         
+      this.loadCss('https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/style.min.css');         
 
-      this.addExternalScript('https://developer.api.autodesk.com/modelderivative/v2/viewers/viewer3D.min.js') 
+      this.loadScript('https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/viewer3D.min.js') 
         .onload = () => {      
-          this.scriptLoaded();  
+          this.onScriptLoaded();  
         }; 
     }
   } 
 
   public loadCss(src: string): HTMLLinkElement {
     const link = document.createElement('link'); 
-    link.rel="stylesheet"
-    link.href="https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/style.min.css"
-    link.type="text/css"
+    link.rel="stylesheet";
+    link.href=src;
+    link.type="text/css";
     document.head.appendChild(link);         
     return link; 
   }
 
-  private addExternalScript(src: string): HTMLScriptElement { 
+  private loadScript(src: string): HTMLScriptElement { 
     const script = document.createElement('script'); 
     script.type = 'text/javascript'; 
     script.src = src; 
@@ -48,7 +48,7 @@ class Viewer extends Component {
     return script; 
   } 
 
-  private scriptLoaded() {
+  private onScriptLoaded() {
     let that: any = this;
     this.getURN(function (urn: string) {
       var options = {
@@ -110,7 +110,7 @@ class Viewer extends Component {
     // loading it dynamically
     const { MyExtension } = await import('./MyExtension');
     MyExtension.register();
-    this.viewer!.loadExtension('MyExtension');
+    this.viewer.loadExtension('MyExtension');
 
     var options2 = {};
     let that: any = this;

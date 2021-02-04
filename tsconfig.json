@@ -1,5 +1,5 @@
 {
-  "types": ["forge-viewer"],
+  
   "compilerOptions": {
     "target": "es5",
     "lib": [
