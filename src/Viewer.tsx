@@ -96,7 +96,7 @@ class Viewer extends Component {
     // A document contains references to 3D and 2D viewables.
     var items = doc.getRoot().search({
       'type': 'geometry',
-      'role': '2d'
+      'role': '3d'
     });
     if (items.length === 0) {
       console.error('Document contains no viewables.');
@@ -104,17 +104,21 @@ class Viewer extends Component {
     }
 
     var viewerDiv: any = document.getElementById('MyViewerDiv');
-    this.viewer = new Autodesk.Viewing.GuiViewer3D(viewerDiv);
-    this.viewer.start();
 
     // loading it dynamically
     const { MyExtension } = await import('./MyExtension');
     MyExtension.register();
-    this.viewer.loadExtension('MyExtension');
+
+    this.viewer = new Autodesk.Viewing.GuiViewer3D(viewerDiv, { extensions: ["MyExtension"]});
+    this.viewer.start();
+
+    // Load it in GuiViewer3D options or here
+    //this.viewer.loadExtension('MyExtension');
 
     var options2 = {};
     let that: any = this;
-    this.viewer.loadDocumentNode(doc, items[1], options2).then(function (model1: Autodesk.Viewing.Model) {
+    this.viewer.loadDocumentNode(doc, items[0], options2).then(function (model1: Autodesk.Viewing.Model) {
+      /*
       var options1: any = {};
       options1.keepCurrentModels = true;
       
@@ -136,6 +140,7 @@ class Viewer extends Component {
               console.log(err);
           })
       });
+      */
     });
   }
 
