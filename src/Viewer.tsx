@@ -1,31 +1,36 @@
 import { Component } from 'react';
 import './Viewer.css';
 
-class Viewer extends Component {
+class Viewer extends Component<any> {
   embedURLfromA360: string; 
   viewer?: Autodesk.Viewing.GuiViewer3D;
+  container: any;
 
-  constructor(props:any) { 
+  constructor(props: any) { 
     // Note: in strict mode this will be called twice
     // https://stackoverflow.com/questions/55119377/react-js-constructor-called-twice
     super(props);  
-    this.embedURLfromA360 = "https://myhub.autodesk360.com/ue29c89b7/shares/public/SH7f1edQT22b515c761e81af7c91890bcea5?mode=embed"; // Revit file (A360/Forge/Napa.rvt)    
+    this.container = props.container;
+    this.embedURLfromA360 = "https://myhub.autodesk360.com/ue29c89b7/shares/public/SH7f1edQT22b515c761e81af7c91890bcea5?mode=embed"; // Revit file (A360/Forge/Napa.rvt)  
   }
 
   render() {
     return (
-      <div className="Viewer" id="MyViewerDiv" />
+      <div className="Viewer" id={this.container} />
     );
   }
 
   public componentDidMount() { 
-    if(!window.Autodesk) { 
+    if(!(window as any).isViewerLoaded) { 
+      (window as any).isViewerLoaded = true;
       this.loadCss('https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/style.min.css');         
 
-      this.loadScript('https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/viewer3D.min.js') 
+      this.loadScript('https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/viewer3D.js') 
         .onload = () => {      
           this.onScriptLoaded();  
         }; 
+    } else {
+      this.onScriptLoaded();  
     }
   } 
 
@@ -56,7 +61,11 @@ class Viewer extends Component {
         getAccessToken: that.getForgeToken.bind(that),
       };
       var documentId: string = "urn:" + urn;
+      
+      console.log("Initializing Forge Viewer ...")
       Autodesk.Viewing.Initializer(options, function onInitialized() {
+        console.log("Forge Viewer initialized!")
+        
         Autodesk.Viewing.Document.load(documentId, that.onDocumentLoadSuccess.bind(that), that.onDocumentLoadError);
       });
     });
@@ -103,44 +112,14 @@ class Viewer extends Component {
       return;
     }
 
-    var viewerDiv: any = document.getElementById('MyViewerDiv');
+    var viewerDiv: any = document.getElementById(this.container);
 
-    // loading it dynamically
-    const { MyExtension } = await import('./MyExtension');
-    MyExtension.register();
-
-    this.viewer = new Autodesk.Viewing.GuiViewer3D(viewerDiv, { extensions: ["MyExtension"]});
+    this.viewer = new Autodesk.Viewing.GuiViewer3D(viewerDiv, {});
     this.viewer.start();
 
-    // Load it in GuiViewer3D options or here
-    //this.viewer.loadExtension('MyExtension');
-
-    var options2 = {};
-    let that: any = this;
-    this.viewer.loadDocumentNode(doc, items[0], options2).then(function (model1: Autodesk.Viewing.Model) {
-      /*
-      var options1: any = {};
-      options1.keepCurrentModels = true;
+    var options = {};
+    this.viewer.loadDocumentNode(doc, items[0], options).then(function (model1: Autodesk.Viewing.Model) {
       
-      that.viewer.loadDocumentNode(doc, items[0], options1).then(function (model2: Autodesk.Viewing.Model) {
-      
-        let extensionConfig: any = {}
-        extensionConfig['mimeType'] ='application/vnd.autodesk.revit'
-        extensionConfig['primaryModels'] = [model1]
-        extensionConfig['diffModels'] = [model2]
-        extensionConfig['diffMode'] =  'overlay' 
-        extensionConfig['versionA'] =  '2' 
-        extensionConfig['versionB'] =  '1' 
-                                    
-        that.viewer.loadExtension('Autodesk.DiffTool', extensionConfig)
-          .then((res: any)=> {
-              console.log(res);                              
-          })
-          .catch(function(err: any) {
-              console.log(err);
-          })
-      });
-      */
     });
   }
 

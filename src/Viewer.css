@@ -1,6 +1,6 @@
-#MyViewerDiv {
-  width: 100%;
-  height: 100%;
+.Viewer {
+  width: 400px;
+  height: 400px;
   margin: 0;
   background-color: #f0f8ff;
   position: relative;
