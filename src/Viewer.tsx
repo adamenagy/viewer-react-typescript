@@ -34,6 +34,12 @@ class Viewer extends Component<any> {
     }
   } 
 
+  public componentWillUnmount() {
+    // Does not seem necessary bt might help somehow
+    console.log("Call finish() on Viewer");
+    this.viewer?.finish();
+  }
+
   public loadCss(src: string): HTMLLinkElement {
     const link = document.createElement('link'); 
     link.rel="stylesheet";
